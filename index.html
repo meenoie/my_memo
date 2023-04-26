@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      @font-face {
+        font-family: 'KCCChassam';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/KCCChassam.woff2')
+          format('woff2');
+        font-weight: normal;
+        font-style: normal;
+      }
+      * {
+        font-family: 'KCCChassam';
+      }
+      p,
+      h2 {
+        margin: 0;
+      }
+
+      body {
+        background-color: beige;
+        padding: 30px;
+      }
+      main {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+      }
+      .inpSec {
+        background-color: rgb(238, 243, 169);
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 3px 3px 5px 3px rgba(0, 0, 0, 0.1);
+      }
+      #display {
+        display: flex;
+        padding: 0 20px;
+        width: calc(100vw - 300px);
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 25px;
+      }
+      article {
+        position: relative;
+        width: 300px;
+        min-height: 200px;
+        padding: 20px;
+        box-sizing: border-box;
+        background-color: rgb(238, 243, 169);
+        box-shadow: 3px 3px 5px 3px rgba(0, 0, 0, 0.1);
+      }
+      p:first-child {
+        margin-bottom: 8px;
+        font-size: 12px;
+
+        color: rgb(93, 93, 93);
+      }
+      h2 {
+        margin-bottom: 8px;
+        color: rgb(54, 54, 54);
+      }
+      h2 + p {
+        font-size: 14px;
+        color: rgb(54, 54, 54);
+      }
+      input {
+        display: block;
+        width: 300px;
+        height: 30px;
+        padding-left: 10px;
+        margin-bottom: 10px;
+        border: 1px solid rgb(164, 168, 107);
+        border-radius: 10px;
+        background-color: rgb(238, 243, 169);
+        box-sizing: border-box;
+      }
+
+      textarea {
+        display: block;
+        width: 300px;
+        height: 300px;
+        border: 1px solid rgb(164, 168, 107);
+        border-radius: 10px;
+        margin-bottom: 10px;
+        background-color: rgb(238, 243, 169);
+        padding: 10px;
+        box-sizing: border-box;
+      }
+
+      button {
+        display: block;
+        cursor: pointer;
+        border: none;
+        margin-left: auto;
+        font-weight: bold;
+      }
+      .btn-del {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        color: rgb(93, 93, 93);
+        background-color: white;
+      }
+      .btn-addMemo {
+        width: 20%;
+        padding: 5px 0;
+        background-color: rgb(238, 243, 169);
+        border: 1px solid rgb(164, 168, 107);
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="inpSec">
+        <input type="text" name="" id="title" placeholder="제목" />
+        <textarea
+          name=""
+          id="content"
+          cols="30"
+          rows="10"
+          placeholder="내용"
+        ></textarea>
+        <button class="btn-addMemo" onclick="saveNote()">메모</button>
+      </section>
+      <section id="display"></section>
+    </main>
+    <script>
+      let allMemo = JSON.parse(localStorage.getItem('allMemo'));
+      allMemo = allMemo ?? [];
+      render();
+
+      function saveNote() {
+        const title = document.getElementById('title').value;
+        const content = document.getElementById('content').value;
+
+        if (title && content) {
+          allMemo.push({ title, content, len: allMemo.length });
+        }
+
+        localStorage.setItem('allMemo', JSON.stringify(allMemo));
+        render();
+      }
+
+      function render() {
+        const display = document.getElementById('display');
+        display.innerHTML = '';
+
+        for (const item of allMemo) {
+          const article = document.createElement('article');
+          const saveTitle = document.createElement('h2');
+          const saveContent = document.createElement('p');
+          const saveId = document.createElement('p');
+          const deleteMemoBtn = document.createElement('button');
+
+          saveTitle.textContent = item.title;
+          saveContent.innerHTML = item.content;
+          saveContent.setAttribute('class', 'content');
+          saveId.textContent = item.len + 1;
+          deleteMemoBtn.textContent = 'x';
+          deleteMemoBtn.setAttribute('id', item.len);
+          deleteMemoBtn.setAttribute('class', 'btn-del');
+          deleteMemoBtn.setAttribute('onclick', 'remove()');
+
+          display.appendChild(article);
+          article.appendChild(saveId);
+          article.appendChild(saveTitle);
+          article.appendChild(saveContent);
+          article.appendChild(deleteMemoBtn);
+        }
+      }
+
+      function remove() {
+        const idx = allMemo.find((item) => item.len == event.srcElement.id);
+        if (idx) {
+          allMemo.splice(
+            allMemo.findIndex((item) => item.len == idx.len),
+            1
+          );
+        }
+        localStorage.setItem('allMemo', JSON.stringify(allMemo));
+        render();
+      }
+    </script>
+  </body>
+</html>
